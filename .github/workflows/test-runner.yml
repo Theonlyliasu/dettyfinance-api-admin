@@ -22,7 +22,7 @@ jobs:
         if: always()
         continue-on-error: true
         run: |
-           newman run Postman-Collections/Postman-Collections.json --reporters cli,allure
+           newman run Postman-Collections/Postman-Collections.json --reporters cli,allure --reporter-allure-export=allure-results
            echo "Postman tests run."
 
       - name: Get Allure history
@@ -80,11 +80,20 @@ jobs:
             echo "Error: summary.json not found in the latest folder."
           fi
 
+      # - name: Deploy report to GitHub Pages
+      #   id: deploy
+      #   if: always()
+      #   uses: peaceiris/actions-gh-pages@v2
+      #   env:
+      #     PERSONAL_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #     PUBLISH_BRANCH: gh-pages
+      #     PUBLISH_DIR: allure-history
       - name: Deploy report to GitHub Pages
         id: deploy
         if: always()
-        uses: peaceiris/actions-gh-pages@v2
-        env:
-          PERSONAL_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PUBLISH_BRANCH: gh-pages
-          PUBLISH_DIR: allure-history
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+           github_token: ${{ secrets.GITHUB_TOKEN }}
+           publish_branch: gh-pages
+           publish_dir: allure-report
+           keep_files: true   # keeps history + CNAME if present
